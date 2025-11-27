@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
-import { ShoppingCart, Search, Menu, X, LogOut, Shield, User, Package, Settings, ShoppingBag, ChevronDown } from "lucide-react"
+import { ShoppingCart, Search, Menu, X, LogOut, Shield, Package, Settings, ShoppingBag, ChevronDown } from "lucide-react"
 import { authService } from "@/lib/auth-service"
 import { useToast } from "@/hooks/use-toast"
 
@@ -14,6 +14,7 @@ export default function Navbar() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [cartCount, setCartCount] = useState(0)
   const [isMounted, setIsMounted] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
   
@@ -25,6 +26,11 @@ export default function Navbar() {
 
   useEffect(() => {
     setIsMounted(true)
+    
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20)
+    }
+    window.addEventListener('scroll', handleScroll)
     
     const adminToken = localStorage.getItem('adminToken')
     if (adminToken) {
@@ -46,15 +52,18 @@ export default function Navbar() {
       }
     }
 
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
       if (!target.closest('.dropdown-container')) {
         setShowDropdown(false)
       }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      window.removeEventListener('scroll', handleScroll)
+    }
   }, [])
 
   const handleLogout = async () => {
@@ -85,30 +94,17 @@ export default function Navbar() {
 
   if (!isMounted) {
     return (
-      <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#0a0a0a] via-[#000000] to-[#000000] backdrop-blur-xl border-b border-[#E8C999]/10 shadow-2xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            <Link href="/" className="text-2xl font-serif font-bold text-black hover:text-primary transition">
-              BanglaBaari
-            </Link>
-            <div className="hidden md:flex items-center gap-8">
-              <Link href="/" className="text-sm font-medium hover:text-primary transition">Home</Link>
-              <Link href="/shop" className="text-sm font-medium hover:text-primary transition">Shop</Link>
-              <Link href="/shop?new=true" className="text-sm font-medium hover:text-primary transition">New Arrivals</Link>
-              <Link href="/shop?winter=true" className="text-sm font-medium hover:text-primary transition">Winter Collection</Link>
-              <Link href="#about" className="text-sm font-medium hover:text-primary transition">About</Link>
-            </div>
-            <div className="hidden md:flex items-center gap-3">
-              <button className="p-2 hover:bg-gray-100 rounded-full transition">
-                <Search size={20} />
-              </button>
-              <div className="p-2 hover:bg-gray-100 rounded-full transition relative">
-                <ShoppingCart size={20} />
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 bg-gradient-to-br from-[#E8C999] via-[#8E1616] to-[#E8C999] rounded-lg flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300">
+                <span className="text-[#000000] font-extrabold text-xl">B</span>
               </div>
-            </div>
-            <button className="md:hidden p-2">
-              <Menu size={24} />
-            </button>
+              <span className="text-2xl font-serif font-bold bg-gradient-to-r from-[#E8C999] via-[#F8EEDF] to-[#E8C999] bg-clip-text text-transparent">
+                BanglaBaari
+              </span>
+            </Link>
           </div>
         </div>
       </nav>
@@ -116,106 +112,114 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4">
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      scrolled 
+        ? 'bg-gradient-to-b from-[#0a0a0a] via-[#000000] to-[#000000] backdrop-blur-2xl shadow-2xl border-b border-[#E8C999]/20' 
+        : 'bg-gradient-to-b from-[#0a0a0a]/95 via-[#000000]/95 to-[#000000]/95 backdrop-blur-xl border-b border-[#E8C999]/10'
+    }`}>
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#E8C999]/5 to-transparent opacity-30"></div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="flex items-center justify-between h-20">
-          <Link href="/" className="text-2xl font-serif font-bold text-black hover:text-primary transition">
-            BanglaBaari
+          
+          <Link href="/" className="flex items-center gap-3 group relative z-10">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#E8C999] via-[#8E1616] to-[#E8C999] rounded-lg flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-all duration-300 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <span className="text-[#000000] font-extrabold text-xl relative z-10">B</span>
+            </div>
+            <span className="text-2xl font-serif font-bold bg-gradient-to-r from-[#E8C999] via-[#F8EEDF] to-[#E8C999] bg-clip-text text-transparent bg-size-200 animate-gradient">
+              BanglaBaari
+            </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
-            <Link href="/" className="text-sm font-medium hover:text-primary transition">
-              Home
+          <div className="hidden lg:flex items-center gap-1">
+            <Link href="/" className="px-4 py-2 text-sm font-semibold text-[#F8EEDF] hover:text-[#E8C999] transition-all duration-300 relative group">
+              <span className="relative z-10">Home</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#8E1616]/0 via-[#8E1616]/10 to-[#8E1616]/0 opacity-0 group-hover:opacity-100 rounded-lg transition-all duration-300"></div>
+              <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#E8C999] to-[#8E1616] group-hover:w-full transition-all duration-300"></div>
             </Link>
-            <Link href="/shop" className="text-sm font-medium hover:text-primary transition">
-              Shop
+            <Link href="/shop" className="px-4 py-2 text-sm font-semibold text-[#F8EEDF] hover:text-[#E8C999] transition-all duration-300 relative group">
+              <span className="relative z-10">Shop</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#8E1616]/0 via-[#8E1616]/10 to-[#8E1616]/0 opacity-0 group-hover:opacity-100 rounded-lg transition-all duration-300"></div>
+              <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#E8C999] to-[#8E1616] group-hover:w-full transition-all duration-300"></div>
             </Link>
-            <Link href="/shop?new=true" className="text-sm font-medium hover:text-primary transition">
-              New Arrivals
+            <Link href="/shop?new=true" className="px-4 py-2 text-sm font-semibold text-[#F8EEDF] hover:text-[#E8C999] transition-all duration-300 relative group">
+              <span className="relative z-10">New Arrivals</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#8E1616]/0 via-[#8E1616]/10 to-[#8E1616]/0 opacity-0 group-hover:opacity-100 rounded-lg transition-all duration-300"></div>
+              <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#E8C999] to-[#8E1616] group-hover:w-full transition-all duration-300"></div>
             </Link>
-            <Link href="/shop?winter=true" className="text-sm font-medium hover:text-primary transition">
-              Winter Collection
+            <Link href="/shop?winter=true" className="px-4 py-2 text-sm font-semibold text-[#F8EEDF] hover:text-[#E8C999] transition-all duration-300 relative group">
+              <span className="relative z-10">Winter Collection</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#8E1616]/0 via-[#8E1616]/10 to-[#8E1616]/0 opacity-0 group-hover:opacity-100 rounded-lg transition-all duration-300"></div>
+              <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#E8C999] to-[#8E1616] group-hover:w-full transition-all duration-300"></div>
             </Link>
-            <Link href="#about" className="text-sm font-medium hover:text-primary transition">
-              About
+            <Link href="#about" className="px-4 py-2 text-sm font-semibold text-[#F8EEDF] hover:text-[#E8C999] transition-all duration-300 relative group">
+              <span className="relative z-10">About</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#8E1616]/0 via-[#8E1616]/10 to-[#8E1616]/0 opacity-0 group-hover:opacity-100 rounded-lg transition-all duration-300"></div>
+              <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#E8C999] to-[#8E1616] group-hover:w-full transition-all duration-300"></div>
             </Link>
           </div>
 
-          <div className="hidden md:flex items-center gap-3">
-            <button className="p-2 hover:bg-gray-100 rounded-full transition">
-              <Search size={20} />
+          <div className="hidden lg:flex items-center gap-4">
+            <button className="p-2.5 hover:bg-[#E8C999]/10 rounded-full transition-all duration-300 group relative">
+              <Search size={20} className="text-[#F8EEDF] group-hover:text-[#E8C999] transition-colors" />
+              <div className="absolute inset-0 rounded-full border border-[#E8C999]/0 group-hover:border-[#E8C999]/30 transition-all duration-300"></div>
             </button>
-            <Link href="/cart" className="p-2 hover:bg-gray-100 rounded-full transition relative">
-              <ShoppingCart size={20} />
+            
+            <Link href="/cart" className="p-2.5 hover:bg-[#E8C999]/10 rounded-full transition-all duration-300 relative group">
+              <ShoppingCart size={20} className="text-[#F8EEDF] group-hover:text-[#E8C999] transition-colors" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium">
+                <span className="absolute -top-1 -right-1 bg-gradient-to-br from-[#8E1616] to-[#E8C999] text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold shadow-lg animate-pulse">
                   {cartCount}
                 </span>
               )}
+              <div className="absolute inset-0 rounded-full border border-[#E8C999]/0 group-hover:border-[#E8C999]/30 transition-all duration-300"></div>
             </Link>
 
             {isAdmin ? (
               <div className="relative dropdown-container">
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 rounded-full transition group"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#8E1616]/20 to-[#E8C999]/20 hover:from-[#8E1616]/30 hover:to-[#E8C999]/30 rounded-full transition-all duration-300 border border-[#E8C999]/30 group"
                 >
-                  <div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-semibold text-sm">
-                    <Shield size={16} />
+                  <div className="w-8 h-8 bg-gradient-to-br from-[#E8C999] to-[#8E1616] rounded-full flex items-center justify-center font-semibold shadow-lg">
+                    <Shield size={16} className="text-[#000000]" />
                   </div>
-                  <span className="text-sm font-medium text-primary">Admin</span>
-                  <ChevronDown size={16} className={`text-primary transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+                  <span className="text-sm font-bold text-[#E8C999]">Admin</span>
+                  <ChevronDown size={16} className={`text-[#E8C999] transition-transform duration-300 ${showDropdown ? 'rotate-180' : ''}`} />
                 </button>
                 
                 {showDropdown && (
-                  <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 border-b border-gray-200">
+                  <div className="absolute right-0 mt-3 w-64 bg-gradient-to-b from-[#0a0a0a] to-[#000000] backdrop-blur-2xl rounded-xl shadow-2xl border border-[#E8C999]/30 overflow-hidden">
+                    <div className="p-4 bg-gradient-to-br from-[#8E1616]/20 to-[#E8C999]/10 border-b border-[#E8C999]/20">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center">
-                          <Shield size={24} />
+                        <div className="w-12 h-12 bg-gradient-to-br from-[#E8C999] to-[#8E1616] rounded-full flex items-center justify-center shadow-xl">
+                          <Shield size={24} className="text-[#000000]" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-gray-900">Admin Panel</p>
-                          <p className="text-xs text-gray-600">Full Access</p>
+                        <div>
+                          <p className="text-sm font-bold text-[#E8C999]">Admin Panel</p>
+                          <p className="text-xs text-[#F8EEDF]/70">Full Access</p>
                         </div>
                       </div>
                     </div>
                     
                     <div className="py-2">
-                      <Link
-                        href="/admin"
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition"
-                        onClick={() => setShowDropdown(false)}
-                      >
-                        <Shield size={18} className="text-primary" />
-                        <span className="font-medium">Dashboard</span>
+                      <Link href="/admin" className="flex items-center gap-3 px-4 py-3 text-sm text-[#F8EEDF] hover:bg-[#E8C999]/10 transition-colors" onClick={() => setShowDropdown(false)}>
+                        <Shield size={18} className="text-[#E8C999]" />
+                        <span className="font-semibold">Dashboard</span>
                       </Link>
-                      <Link
-                        href="/admin/add-product"
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition"
-                        onClick={() => setShowDropdown(false)}
-                      >
-                        <Package size={18} className="text-gray-500" />
-                        <span className="font-medium">Add Product</span>
+                      <Link href="/admin/add-product" className="flex items-center gap-3 px-4 py-3 text-sm text-[#F8EEDF] hover:bg-[#E8C999]/10 transition-colors" onClick={() => setShowDropdown(false)}>
+                        <Package size={18} className="text-[#F8EEDF]/70" />
+                        <span className="font-semibold">Add Product</span>
                       </Link>
-                      <Link
-                        href="/admin/manage-products"
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition"
-                        onClick={() => setShowDropdown(false)}
-                      >
-                        <Settings size={18} className="text-gray-500" />
-                        <span className="font-medium">Manage Products</span>
+                      <Link href="/admin/manage-products" className="flex items-center gap-3 px-4 py-3 text-sm text-[#F8EEDF] hover:bg-[#E8C999]/10 transition-colors" onClick={() => setShowDropdown(false)}>
+                        <Settings size={18} className="text-[#F8EEDF]/70" />
+                        <span className="font-semibold">Manage Products</span>
                       </Link>
                     </div>
                     
-                    <div className="border-t border-gray-200 bg-gray-50">
-                      <button
-                        onClick={() => {
-                          setShowDropdown(false)
-                          handleAdminLogout()
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-error font-medium hover:bg-red-50 transition"
-                      >
+                    <div className="border-t border-[#E8C999]/20 bg-[#000000]/50">
+                      <button onClick={() => { setShowDropdown(false); handleAdminLogout() }} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#8E1616] font-bold hover:bg-[#8E1616]/10 transition-colors">
                         <LogOut size={18} />
                         <span>Logout</span>
                       </button>
@@ -227,48 +231,38 @@ export default function Navbar() {
               <div className="relative dropdown-container">
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-full transition group"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-[#E8C999]/10 hover:bg-[#E8C999]/20 rounded-full transition-all duration-300 border border-[#E8C999]/20 group"
                 >
-                  <div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-semibold text-sm">
+                  <div className="w-8 h-8 bg-gradient-to-br from-[#E8C999] to-[#F8EEDF] rounded-full flex items-center justify-center font-bold text-sm shadow-lg text-[#000000]">
                     {userName.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-sm font-medium max-w-[100px] truncate">{userName}</span>
-                  <ChevronDown size={16} className={`transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+                  <span className="text-sm font-semibold text-[#F8EEDF] max-w-[100px] truncate">{userName}</span>
+                  <ChevronDown size={16} className={`text-[#E8C999] transition-transform duration-300 ${showDropdown ? 'rotate-180' : ''}`} />
                 </button>
                 
                 {showDropdown && (
-                  <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 border-b border-gray-200">
+                  <div className="absolute right-0 mt-3 w-64 bg-gradient-to-b from-[#0a0a0a] to-[#000000] backdrop-blur-2xl rounded-xl shadow-2xl border border-[#E8C999]/30 overflow-hidden">
+                    <div className="p-4 bg-gradient-to-br from-[#E8C999]/10 to-[#E8C999]/5 border-b border-[#E8C999]/20">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center font-bold text-lg">
+                        <div className="w-12 h-12 bg-gradient-to-br from-[#E8C999] to-[#F8EEDF] rounded-full flex items-center justify-center font-bold text-lg shadow-xl text-[#000000]">
                           {userName.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-gray-900 truncate">{userName}</p>
-                          <p className="text-xs text-gray-600 truncate">{userEmail}</p>
+                          <p className="text-sm font-bold text-[#E8C999] truncate">{userName}</p>
+                          <p className="text-xs text-[#F8EEDF]/70 truncate">{userEmail}</p>
                         </div>
                       </div>
                     </div>
                     
                     <div className="py-2">
-                      <Link
-                        href="/orders"
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition"
-                        onClick={() => setShowDropdown(false)}
-                      >
-                        <ShoppingBag size={18} className="text-gray-500" />
-                        <span className="font-medium">My Orders</span>
+                      <Link href="/orders" className="flex items-center gap-3 px-4 py-3 text-sm text-[#F8EEDF] hover:bg-[#E8C999]/10 transition-colors" onClick={() => setShowDropdown(false)}>
+                        <ShoppingBag size={18} className="text-[#F8EEDF]/70" />
+                        <span className="font-semibold">My Orders</span>
                       </Link>
                     </div>
                     
-                    <div className="border-t border-gray-200 bg-gray-50">
-                      <button
-                        onClick={() => {
-                          setShowDropdown(false)
-                          handleLogout()
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-error font-medium hover:bg-red-50 transition"
-                      >
+                    <div className="border-t border-[#E8C999]/20 bg-[#000000]/50">
+                      <button onClick={() => { setShowDropdown(false); handleLogout() }} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#8E1616] font-bold hover:bg-[#8E1616]/10 transition-colors">
                         <LogOut size={18} />
                         <span>Logout</span>
                       </button>
@@ -277,134 +271,114 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="px-5 py-2.5 border-2 border-primary text-primary text-sm font-medium rounded-lg hover:bg-primary hover:text-white transition"
-                >
+              <div className="flex items-center gap-3">
+                <Link href="/login" className="px-6 py-2.5 border-2 border-[#E8C999] text-[#E8C999] text-sm font-bold rounded-lg hover:bg-[#E8C999] hover:text-[#000000] transition-all duration-300 shadow-lg hover:shadow-[#E8C999]/20">
                   Login
                 </Link>
-                <Link
-                  href="/register"
-                  className="px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-light transition shadow-sm"
-                >
+                <Link href="/register" className="px-6 py-2.5 bg-gradient-to-r from-[#8E1616] to-[#E8C999] text-[#000000] text-sm font-bold rounded-lg hover:from-[#E8C999] hover:to-[#8E1616] transition-all duration-300 shadow-xl hover:shadow-[#E8C999]/30 hover:scale-105">
                   Register
                 </Link>
-              </>
+              </div>
             )}
           </div>
 
-          <button className="md:hidden p-2" onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          <button className="lg:hidden p-2 hover:bg-[#E8C999]/10 rounded-lg transition-colors" onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? <X size={24} className="text-[#E8C999]" /> : <Menu size={24} className="text-[#F8EEDF]" />}
           </button>
         </div>
 
         {isOpen && (
-          <div className="md:hidden pb-4 border-t border-gray-200 bg-white">
+          <div className="lg:hidden pb-4 border-t border-[#E8C999]/20 bg-gradient-to-b from-[#0a0a0a] to-[#000000] backdrop-blur-xl">
             <div className="flex flex-col gap-1 mt-4">
-              <Link href="/" className="text-sm font-medium px-4 py-3 hover:bg-gray-50 rounded-lg transition">
+              <Link href="/" className="text-sm font-semibold px-4 py-3 text-[#F8EEDF] hover:bg-[#E8C999]/10 hover:text-[#E8C999] rounded-lg transition-all" onClick={() => setIsOpen(false)}>
                 Home
               </Link>
-              <Link href="/shop" className="text-sm font-medium px-4 py-3 hover:bg-gray-50 rounded-lg transition">
+              <Link href="/shop" className="text-sm font-semibold px-4 py-3 text-[#F8EEDF] hover:bg-[#E8C999]/10 hover:text-[#E8C999] rounded-lg transition-all" onClick={() => setIsOpen(false)}>
                 Shop
               </Link>
-              <Link href="/shop?new=true" className="text-sm font-medium px-4 py-3 hover:bg-gray-50 rounded-lg transition">
+              <Link href="/shop?new=true" className="text-sm font-semibold px-4 py-3 text-[#F8EEDF] hover:bg-[#E8C999]/10 hover:text-[#E8C999] rounded-lg transition-all" onClick={() => setIsOpen(false)}>
                 New Arrivals
               </Link>
-              <Link href="/shop?winter=true" className="text-sm font-medium px-4 py-3 hover:bg-gray-50 rounded-lg transition">
+              <Link href="/shop?winter=true" className="text-sm font-semibold px-4 py-3 text-[#F8EEDF] hover:bg-[#E8C999]/10 hover:text-[#E8C999] rounded-lg transition-all" onClick={() => setIsOpen(false)}>
                 Winter Collection
               </Link>
-              <Link href="#about" className="text-sm font-medium px-4 py-3 hover:bg-gray-50 rounded-lg transition">
+              <Link href="#about" className="text-sm font-semibold px-4 py-3 text-[#F8EEDF] hover:bg-[#E8C999]/10 hover:text-[#E8C999] rounded-lg transition-all" onClick={() => setIsOpen(false)}>
                 About
               </Link>
               
+              <Link href="/cart" className="flex items-center justify-between text-sm font-semibold px-4 py-3 text-[#F8EEDF] hover:bg-[#E8C999]/10 hover:text-[#E8C999] rounded-lg transition-all" onClick={() => setIsOpen(false)}>
+                <span className="flex items-center gap-2">
+                  <ShoppingCart size={18} />
+                  Cart
+                </span>
+                {cartCount > 0 && (
+                  <span className="bg-gradient-to-br from-[#8E1616] to-[#E8C999] text-white text-xs px-2.5 py-1 rounded-full font-bold shadow-lg">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+              
               {isAdmin ? (
-                <>
-                  <div className="border-t border-gray-200 mt-2 pt-2">
-                    <div className="px-4 py-3 bg-primary/10 rounded-lg mx-4 mb-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center">
-                          <Shield size={20} />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900">Admin Panel</p>
-                          <p className="text-xs text-gray-600">Full Access</p>
-                        </div>
+                <div className="border-t border-[#E8C999]/20 mt-3 pt-3">
+                  <div className="px-4 py-3 bg-gradient-to-r from-[#8E1616]/20 to-[#E8C999]/20 rounded-lg mx-4 mb-3 border border-[#E8C999]/20">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-[#E8C999] to-[#8E1616] rounded-full flex items-center justify-center shadow-lg">
+                        <Shield size={20} className="text-[#000000]" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-[#E8C999]">Admin Panel</p>
+                        <p className="text-xs text-[#F8EEDF]/70">Full Access</p>
                       </div>
                     </div>
-                    <Link
-                      href="/admin"
-                      className="flex items-center gap-2 text-sm font-medium px-4 py-3 hover:bg-gray-50 rounded-lg transition"
-                    >
-                      <Shield size={18} className="text-primary" />
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/admin/add-product"
-                      className="flex items-center gap-2 text-sm font-medium px-4 py-3 hover:bg-gray-50 rounded-lg transition"
-                    >
-                      <Package size={18} />
-                      Add Product
-                    </Link>
-                    <Link
-                      href="/admin/manage-products"
-                      className="flex items-center gap-2 text-sm font-medium px-4 py-3 hover:bg-gray-50 rounded-lg transition"
-                    >
-                      <Settings size={18} />
-                      Manage Products
-                    </Link>
-                    <button
-                      onClick={handleAdminLogout}
-                      className="w-full mt-2 mx-4 px-4 py-3 bg-error text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2"
-                      style={{width: 'calc(100% - 2rem)'}}
-                    >
-                      <LogOut size={16} />
-                      Logout
-                    </button>
                   </div>
-                </>
+                  <Link href="/admin" className="flex items-center gap-2 text-sm font-semibold px-4 py-3 text-[#F8EEDF] hover:bg-[#E8C999]/10 hover:text-[#E8C999] rounded-lg transition-all" onClick={() => setIsOpen(false)}>
+                    <Shield size={18} />
+                    Dashboard
+                  </Link>
+                  <Link href="/admin/add-product" className="flex items-center gap-2 text-sm font-semibold px-4 py-3 text-[#F8EEDF] hover:bg-[#E8C999]/10 hover:text-[#E8C999] rounded-lg transition-all" onClick={() => setIsOpen(false)}>
+                    <Package size={18} />
+                    Add Product
+                  </Link>
+                  <Link href="/admin/manage-products" className="flex items-center gap-2 text-sm font-semibold px-4 py-3 text-[#F8EEDF] hover:bg-[#E8C999]/10 hover:text-[#E8C999] rounded-lg transition-all" onClick={() => setIsOpen(false)}>
+                    <Settings size={18} />
+                    Manage Products
+                  </Link>
+                  <button onClick={handleAdminLogout} className="w-full mt-2 mx-4 px-4 py-3 bg-gradient-to-r from-[#8E1616] to-[#8E1616]/80 hover:from-[#8E1616]/90 hover:to-[#8E1616] text-white text-sm font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg" style={{width: 'calc(100% - 2rem)'}}>
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
               ) : isLoggedIn ? (
-                <>
-                  <div className="border-t border-gray-200 mt-2 pt-2">
-                    <div className="px-4 py-3 bg-gray-50 rounded-lg mx-4 mb-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold">
-                          {userName.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-gray-900 truncate">{userName}</p>
-                          <p className="text-xs text-gray-600 truncate">{userEmail}</p>
-                        </div>
+                <div className="border-t border-[#E8C999]/20 mt-3 pt-3">
+                  <div className="px-4 py-3 bg-[#E8C999]/10 rounded-lg mx-4 mb-3 border border-[#E8C999]/20">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-[#E8C999] to-[#F8EEDF] rounded-full flex items-center justify-center font-bold shadow-lg text-[#000000]">
+                        {userName.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-[#E8C999] truncate">{userName}</p>
+                        <p className="text-xs text-[#F8EEDF]/70 truncate">{userEmail}</p>
                       </div>
                     </div>
-                    <Link
-                      href="/orders"
-                      className="flex items-center gap-2 text-sm font-medium px-4 py-3 hover:bg-gray-50 rounded-lg transition"
-                    >
-                      <ShoppingBag size={18} />
-                      My Orders
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full mt-2 mx-4 px-4 py-3 bg-error text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2"
-                      style={{width: 'calc(100% - 2rem)'}}
-                    >
-                      <LogOut size={16} />
-                      Logout
-                    </button>
                   </div>
-                </>
+                  <Link href="/orders" className="flex items-center gap-2 text-sm font-semibold px-4 py-3 text-[#F8EEDF] hover:bg-[#E8C999]/10 hover:text-[#E8C999] rounded-lg transition-all" onClick={() => setIsOpen(false)}>
+                    <ShoppingBag size={18} />
+                    My Orders
+                  </Link>
+                  <button onClick={handleLogout} className="w-full mt-2 mx-4 px-4 py-3 bg-gradient-to-r from-[#8E1616] to-[#8E1616]/80 hover:from-[#8E1616]/90 hover:to-[#8E1616] text-white text-sm font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg" style={{width: 'calc(100% - 2rem)'}}>
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
               ) : (
-                <>
-                  <div className="border-t border-gray-200 mt-2 pt-2 px-4 space-y-2">
-                    <Link href="/login" className="block px-4 py-3 border-2 border-primary text-primary text-sm font-medium text-center rounded-lg hover:bg-primary hover:text-white transition">
-                      Login
-                    </Link>
-                    <Link href="/register" className="block px-4 py-3 bg-primary text-white text-sm font-medium text-center rounded-lg hover:bg-primary-light transition">
-                      Register
-                    </Link>
-                  </div>
-                </>
+                <div className="border-t border-[#E8C999]/20 mt-3 pt-3 px-4 space-y-2">
+                  <Link href="/login" className="block px-4 py-3 border-2 border-[#E8C999] text-[#E8C999] text-sm font-bold text-center rounded-lg hover:bg-[#E8C999] hover:text-[#000000] transition-all shadow-lg" onClick={() => setIsOpen(false)}>
+                    Login
+                  </Link>
+                  <Link href="/register" className="block px-4 py-3 bg-gradient-to-r from-[#8E1616] to-[#E8C999] text-[#000000] text-sm font-bold text-center rounded-lg hover:from-[#E8C999] hover:to-[#8E1616] transition-all shadow-xl" onClick={() => setIsOpen(false)}>
+                    Register
+                  </Link>
+                </div>
               )}
             </div>
           </div>
