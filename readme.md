@@ -1,4 +1,4 @@
-# BanglaBaari - E-commerce Platform
+# BanglaBaari - E-commerce Platform (Frontend)
 
 A modern online marketplace for buying and selling products. Built with Next.js and Express.js.
 
@@ -7,7 +7,9 @@ A modern online marketplace for buying and selling products. Built with Next.js 
 ## Links
 
 **Live Site:** [https://bb-frontend-eight.vercel.app](https://bb-frontend-eight.vercel.app)  
-**GitHub:** [https://github.com/mdasifmahmuddev/bb-frontend](https://github.com/mdasifmahmuddev/bb-frontend)
+**Admin Dashboard:** [https://bb-frontend-eight.vercel.app/admin/login](https://bb-frontend-eight.vercel.app/admin/login)  
+**GitHub:** [https://github.com/mdasifmahmuddev/bb-frontend](https://github.com/mdasifmahmuddev/bb-frontend)  
+**Backend API:** [https://bb-backend-delta.vercel.app](https://bb-backend-delta.vercel.app)
 
 ---
 
@@ -20,30 +22,8 @@ A modern online marketplace for buying and selling products. Built with Next.js 
 
 ### Installation
 
-**Backend Setup**
-```bash
-cd backend
-npm install
-```
-
-Create `.env`:
-```env
-MONGODB_URI=your_mongodb_uri
-PORT=5000
-JWT_SECRET=your_secret_key
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=admin123
-FRONTEND_URL=http://localhost:3000
-GOOGLE_CLIENT_ID=your_google_client_id
-```
-
-```bash
-npm start
-```
-
 **Frontend Setup**
 ```bash
-cd frontend
 npm install
 ```
 
@@ -82,6 +62,8 @@ Visit `http://localhost:3000`
 | `/products/[id]` | Public | Product details |
 | `/add-product` | Protected | Add product |
 | `/manage-products` | Protected | Manage products |
+| `/admin/login` | Public | Admin login |
+| `/admin/dashboard` | Admin | Admin dashboard |
 
 ---
 
@@ -111,6 +93,12 @@ Visit `http://localhost:3000`
 - Manage your listings
 - Delete products
 
+**Admin Features**
+- Separate admin dashboard at `/admin/login`
+- Manage all products
+- User management
+- Admin-only access control
+
 **UI/UX**
 - Hover effects on cards
 - Toast notifications
@@ -119,15 +107,11 @@ Visit `http://localhost:3000`
 
 ---
 
-## API Endpoints
+## Admin Access
 
-| Method | Endpoint | Auth |
-|--------|----------|------|
-| GET | `/api/products` | No |
-| GET | `/api/products/:id` | No |
-| POST | `/api/products` | Yes |
-| DELETE | `/api/products/:id` | Yes |
+**Admin Login:** [https://bb-frontend-eight.vercel.app/admin/login](https://bb-frontend-eight.vercel.app/admin/login)
+
+Use admin credentials from backend `.env` to access dashboard.
 
 ---
-
  
