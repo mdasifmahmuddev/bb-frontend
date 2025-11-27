@@ -6,8 +6,8 @@ A modern online marketplace for buying and selling products. Built with Next.js 
 
 ## Links
 
-**Live Site:**  https://bb-frontend-eight.vercel.app
-**GitHub:**  https://github.com/mdasifmahmuddev/bb-frontend
+**Live Site:** [https://bb-frontend-eight.vercel.app](https://bb-frontend-eight.vercel.app)  
+**GitHub:** [https://github.com/mdasifmahmuddev/bb-frontend](https://github.com/mdasifmahmuddev/bb-frontend)
 
 ---
 
@@ -129,4 +129,5 @@ Visit `http://localhost:3000`
 | DELETE | `/api/products/:id` | Yes |
 
 ---
+
  
